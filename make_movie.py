@@ -6,6 +6,7 @@ import matplotlib.animation as animation
 from utils.checkpoints import *
 from utils.config import *
 from utils.model import *
+from utils.pca import *
 
 PRINT = 100
 
@@ -21,16 +22,10 @@ Mlist = []
 for i in range(FRAMES):
     load_checkpoint(model, None, task_dir, epoch=i*PRINT)
     model.eval()
-#    torch.manual_seed(1)
-#    A = model.embed1.weight.transpose(0,1)
-#    V = torch.pca_lowrank(A)[2]
-#    M = torch.matmul(A, V[:, :2])
-    A = model.embed1.weight.transpose(0,1)
-    A = A - A.mean(dim=0)
-    U, S, _ = torch.linalg.svd(A)
-    M = (U@torch.diag(S))[:, :2]
+
+    M = pca(model.embed1.weight)
+
     Mlist.append(M.detach().numpy())
-#    M.append(torch.load('data/pca' + str(i) + '.pt').detach().numpy())
 
 fig, ax = plt.subplots()
 scat = ax.scatter(Mlist[0][:,0], Mlist[0][:,1])

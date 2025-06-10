@@ -5,10 +5,10 @@ import random
 from utils.checkpoints import *
 from utils.config import *
 from utils.model import *
+from utils.pca import *
 
 import matplotlib.pyplot as plt
 
-import tqdm
 
 PRINT = 100
 CHECKPOINT = 100
@@ -45,7 +45,7 @@ train_dataloader = DataLoader(train_dataset, batch_size=len(train_dataset))
 
 lossfn = torch.nn.CrossEntropyLoss()
 
-torch.manual_seed(seed)
+torch.manual_seed(1)#seed)
 model = MyModel(n, layers['embed_dim'], layers['hidden_dim'])
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay, betas=betas)
@@ -56,7 +56,14 @@ if load:
 
 # train the model
 
-for i in tqdm.tqdm(range(num_epochs)):
+_iter = range(num_epochs)
+try:
+    import tqdm
+
+    _iter = tqdm.tqdm(_iter)
+except ImportError: pass
+
+for i in _iter:
     for train_x, train_y in train_dataloader:
         optimizer.zero_grad()
 
@@ -82,15 +89,7 @@ for i in tqdm.tqdm(range(num_epochs)):
 
 save_checkpoint(model, optimizer, task_dir, final=True)
 
-torch.manual_seed(1)
-A = model.embed1.weight.transpose(0,1)
-V = torch.pca_lowrank(A)[2]
-M = torch.matmul(A, V[:, :2])
-
-#A = model.embed1.weight.transpose(0,1)
-#A = A - A.mean(dim=0)
-#U, S, _ = torch.linalg.svd(A)
-#M = (U@torch.diag(S))[:, :2]
+M = pca(model.embed1.weight)
 
 X = []
 Y = []
