@@ -1,127 +1,105 @@
 import torch
+from torch.utils.data import Dataset, DataLoader, TensorDataset
 import random
+
+from utils.checkpoints import *
+from utils.config import *
+from utils.model import *
 
 import matplotlib.pyplot as plt
 
-n = 15 # cyclic group of order 2*n
-embed = 2*n+1
-hidden = 2*embed
-train = int(.6*(2*n)*(2*n)) # data points for training
-EPOCHS = 10000
+import tqdm
+
 PRINT = 100
 
-# group multiplication in the dihedral group
-# integers 0,...,n-1 represent the rotations
-# integers n,...,2n-1 represent reflection times rotation
-def add(a: int, b: int) -> int:
-    assert a >= 0 and a < 2*n
-    assert b >= 0 and b < 2*n
+task_dir = "tasks/first"
 
-    return (a+b)%(2*n)
-    s = n*((a // n + b // n) % 2)
-    if b >= n: r = (n - a + b)%n
-    else: r = (a + b)%n
-    return r + s
+seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task_dir)
+
+def add(a: int, b: int) -> int:
+    assert a >= 0 and a < n
+    assert b >= 0 and b < n
+
+    return (a+b)%n
 
 # generate training and test data
 # pick train samples at random from the multiplication table to form the training set
 # use the whole multiplication table as the test set
 
-train_a, train_b, train_c = [], [], []
-test_a, test_b, test_c = [], [], []
-rest = train
-for i in range((2*n)*(2*n)):
-    a = i%(2*n)
-    b = i//(2*n)
+test_x, test_y = [], []
+for i in range(n*n):
+    a = i%n
+    b = i//n
     c = add(a, b)
-    test_a.append([1.0 if j == a else 0.0 for j in range(2*n)])
-    test_b.append([1.0 if j == b else 0.0 for j in range(2*n)])
-    test_c.append(c)
-    if random.random() <= rest/((2*n)*(2*n)-i):
-        train_a.append([1.0 if j == a else 0.0 for j in range(2*n)])
-        train_b.append([1.0 if j == b else 0.0 for j in range(2*n)])
-        train_c.append(c)
-        rest -= 1
-train_a = torch.tensor(train_a)
-train_b = torch.tensor(train_b)
-train_c = torch.tensor(train_c)
-test_a = torch.tensor(test_a)
-test_b = torch.tensor(test_b)
-test_c = torch.tensor(test_c)
+    test_x.append([[1.0 if j == a else 0.0 for j in range(n)], [1.0 if j == b else 0.0 for j in range(n)]])
+    test_y.append(c)
 
-# define the model
+test_x = torch.tensor(test_x)
+test_y = torch.tensor(test_y)
 
-class MyModel(torch.nn.Module):
-    def __init__(self):
-        super(MyModel, self).__init__()
+test_dataset = TensorDataset(test_x, test_y)
+random.seed(seed)
+train_dataset = torch.utils.data.Subset(test_dataset, random.sample(range(n*n), int(frac_train*n*n)))
+train_dataloader = DataLoader(train_dataset, batch_size=len(train_dataset))
 
-        self.embed1 = torch.nn.Linear(2*n, embed)
-        self.embed2 = torch.nn.Linear(2*n, embed)
-        self.linear1 = torch.nn.Linear(2*embed, hidden)
-        self.unembed = torch.nn.Linear(hidden, 2*n)
+lossfn = torch.nn.CrossEntropyLoss()
 
-    def forward(self, a, b):
-        a = self.embed1(a)
-        b = self.embed2(b)
-        x = torch.cat([a, b], dim=-1)
-        x = self.linear1(x)
-        x = torch.nn.functional.relu(x)
-        x = self.unembed(x)
-        return x
+torch.manual_seed(seed)
+model = MyModel(n, layers['embed_dim'], layers['hidden_dim'])
 
-model = MyModel()
+optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay, betas=betas)
 
 load=False
 if load:
-    train_a = torch.load('data/traina.pt')
-    train_b = torch.load('data/trainb.pt')
-    train_c = torch.load('data/trainc.pt')
-    model = torch.load('data/model.pt')
-else:
-    torch.save(train_a, 'data/traina.pt')
-    torch.save(train_b, 'data/trainb.pt')
-    torch.save(train_c, 'data/trainc.pt')
-
-#optimizer = torch.optim.Adam(model.parameters(), weight_decay=0.001)
-optimizer = torch.optim.Adam(model.parameters(), lr=.01, weight_decay=0.001, betas=(.9, .98))
-#optimizer = torch.optim.SGD(model.parameters(), lr=.1, weight_decay=0.001)
-#scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=1)
-lossfn = torch.nn.CrossEntropyLoss()
+    load_checkpoint(model, optimizer, task_dir, final=True)
 
 # train the model
 
-for i in range(EPOCHS):
-    optimizer.zero_grad()
+for i in tqdm.tqdm(range(num_epochs)):
+    for train_x, train_y in train_dataloader:
+        optimizer.zero_grad()
 
-    y = model(train_a, train_b)
-    loss = lossfn(y, train_c)
-    loss.backward()
+        y = model(train_x)
+        loss = lossfn(y, train_y)
+        loss.backward()
 
-    optimizer.step()
+        optimizer.step()
 
-    if (i+1) % PRINT == 0:
-        y = model(test_a, test_b)
-        loss_test = lossfn(y, test_c)
-        print("epoch: {} training loss: {} test loss: {}".format(i, float(loss), float(loss_test)))
-        torch.manual_seed(0)
-        A = model.embed1.weight.transpose(0,1)
-        V = torch.pca_lowrank(A)[2]
-        M = torch.matmul(A, V[:, :2])
-        torch.save(M, 'data/pca' + str(i//(PRINT)) + '.pt')
-#        print(M)
-#        scheduler.step()
+        if i % PRINT == 0:
+            y = model(test_x)
+            loss_test = lossfn(y, test_y)
+            if i == num_epochs-1:
+                for j in range(n*n):
+                    if torch.max(y[j],0).indices != test_y[j]:
+                        print(f"{j%n}+{j//n}:")
+                        print(f"Answer: {test_y[j]} Prediction: {torch.max(y[j],0).indices}")
+                        print(y[j])
+            print(f"Epoch: {i} Training loss: {float(loss)} Test loss: {float(loss_test)}")
 
-torch.save(model, 'data/model.pt')
+            save_checkpoint(model, optimizer, task_dir, epoch=i)
+#            A = model.embed1.weight.transpose(0,1)
+#            A = A - A.mean(dim=0)
+#            U, S, _ = torch.linalg.svd(A)
+#            M = (U@torch.diag(S))[:, :2]
+#            torch.save(M, 'data/pca' + str(i//(PRINT)) + '.pt')
 
+save_checkpoint(model, optimizer, task_dir, final=True)
+
+torch.manual_seed(1)
 A = model.embed1.weight.transpose(0,1)
 V = torch.pca_lowrank(A)[2]
 M = torch.matmul(A, V[:, :2])
+
+#A = model.embed1.weight.transpose(0,1)
+#A = A - A.mean(dim=0)
+#U, S, _ = torch.linalg.svd(A)
+#M = (U@torch.diag(S))[:, :2]
 
 X = []
 Y = []
 S = []
 m = []
-for i in range(2*n):
+for i in range(n):
     X.append(float(M[i][0]))
     Y.append(float(M[i][1]))
 
@@ -132,7 +110,7 @@ ax = fig.add_subplot()
 
 ax.scatter(X, Y)
 
-for i in range(2*n):
+for i in range(n):
     ax.text(X[i], Y[i], str(i))
 
 fig.savefig('MyFigure.png', dpi=200)
