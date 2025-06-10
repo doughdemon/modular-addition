@@ -15,6 +15,11 @@ task_dir = "tasks/first"
 
 seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task_dir)
 
+if torch.cuda.is_available():
+    device = 'cuda'
+else:
+    device = 'cpu'
+
 def add(a: int, b: int) -> int:
     assert a >= 0 and a < n
     assert b >= 0 and b < n
@@ -33,8 +38,8 @@ for i in range(n*n):
     test_x.append([[1.0 if j == a else 0.0 for j in range(n)], [1.0 if j == b else 0.0 for j in range(n)]])
     test_y.append(c)
 
-test_x = torch.tensor(test_x)
-test_y = torch.tensor(test_y)
+test_x = torch.tensor(test_x).to(device)
+test_y = torch.tensor(test_y).to(device)
 
 test_dataset = TensorDataset(test_x, test_y)
 random.seed(seed)
@@ -43,8 +48,8 @@ train_dataloader = DataLoader(train_dataset, batch_size=len(train_dataset))
 
 lossfn = torch.nn.CrossEntropyLoss()
 
-torch.manual_seed(1)#seed)
-model = MyModel(n, layers['embed_dim'], layers['hidden_dim'])
+torch.manual_seed(seed)
+model = MyModel(n, layers['embed_dim'], layers['hidden_dim']).to(device)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay, betas=betas)
 
