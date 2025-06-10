@@ -7,8 +7,6 @@ from utils.config import *
 from utils.model import *
 from utils.pca import *
 
-import matplotlib.pyplot as plt
-
 
 PRINT = 100
 CHECKPOINT = 100
@@ -88,25 +86,3 @@ for i in _iter:
             save_checkpoint(model, optimizer, task_dir, epoch=i)
 
 save_checkpoint(model, optimizer, task_dir, final=True)
-
-M = pca(model.embed1.weight)
-
-X = []
-Y = []
-S = []
-m = []
-for i in range(n):
-    X.append(float(M[i][0]))
-    Y.append(float(M[i][1]))
-
-# plot
-
-fig = plt.figure()
-ax = fig.add_subplot()
-
-ax.scatter(X, Y)
-
-for i in range(n):
-    ax.text(X[i], Y[i], str(i))
-
-fig.savefig('MyFigure.png', dpi=200)
