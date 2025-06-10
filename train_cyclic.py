@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 import tqdm
 
 PRINT = 100
+CHECKPOINT = 100
 
 task_dir = "tasks/first"
 
@@ -76,12 +77,8 @@ for i in tqdm.tqdm(range(num_epochs)):
                         print(y[j])
             print(f"Epoch: {i} Training loss: {float(loss)} Test loss: {float(loss_test)}")
 
+        if i % CHECKPOINT == 0:
             save_checkpoint(model, optimizer, task_dir, epoch=i)
-#            A = model.embed1.weight.transpose(0,1)
-#            A = A - A.mean(dim=0)
-#            U, S, _ = torch.linalg.svd(A)
-#            M = (U@torch.diag(S))[:, :2]
-#            torch.save(M, 'data/pca' + str(i//(PRINT)) + '.pt')
 
 save_checkpoint(model, optimizer, task_dir, final=True)
 
