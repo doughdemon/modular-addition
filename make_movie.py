@@ -10,6 +10,8 @@ from utils.pca import *
 
 PRINT = 100
 
+filename = 'animation.mp4'
+
 task_dir = "tasks/first"
 
 _, _, layers, _, n, _, _, num_epochs = load_cfg(task_dir)
@@ -38,4 +40,4 @@ def update(frame):
 ani = animation.FuncAnimation(fig, update, frames=FRAMES)
 
 FFwriter = animation.FFMpegWriter()
-ani.save('animation.mp4', writer=FFwriter)
+ani.save(filename, writer=FFwriter)

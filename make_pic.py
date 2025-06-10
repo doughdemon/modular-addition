@@ -7,6 +7,8 @@ from utils.pca import *
 
 import matplotlib.pyplot as plt
 
+filename = 'MyFigure.png'
+
 task_dir = "tasks/first"
 
 _, _, layers, _, n, _, _, num_epochs = load_cfg(task_dir)
@@ -35,4 +37,4 @@ ax.scatter(X, Y)
 for i in range(n):
     ax.text(X[i], Y[i], str(i))
 
-fig.savefig('MyFigure.png', dpi=200)
+fig.savefig(filename, dpi=200)
