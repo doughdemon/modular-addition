@@ -5,7 +5,7 @@ def pca(x, dims=2):
 
     if True:
         torch.manual_seed(1)
-        V = torch.pca_lowrank(A)[dims]
+        V = torch.pca_lowrank(A)[2]
         return torch.matmul(A, V[:, :dims])
     else:
         A = A - A.mean(dim=0)
