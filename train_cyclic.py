@@ -12,7 +12,7 @@ from utils.pca import *
 PRINT = 100
 CHECKPOINT = 100
 
-parser = argparse.ArgumentParser(prog='make_pic.py', description='Create a figure')
+parser = argparse.ArgumentParser(prog='train_cyclic.py', description='Train the neural net')
 parser.add_argument('task', help="task directory")
 
 args = parser.parse_args()

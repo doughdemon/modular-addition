@@ -11,7 +11,7 @@ from utils.pca import *
 import matplotlib.pyplot as plt
 
 
-parser = argparse.ArgumentParser(prog='make_pic.py', description='Create a figure')
+parser = argparse.ArgumentParser(prog='make_pic.py', description='Visualize the first embedding')
 parser.add_argument('task', help="task directory")
 parser.add_argument('-f', '--file', default='MyFigure.png')
 parser.add_argument('-e', '--epoch', default=None)
