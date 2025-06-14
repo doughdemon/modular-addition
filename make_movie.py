@@ -1,3 +1,4 @@
+import argparse
 import torch
 
 import matplotlib.pyplot as plt
@@ -5,39 +6,37 @@ import matplotlib.animation as animation
 
 from utils.checkpoints import *
 from utils.config import *
+from utils.figure_mpl import *
 from utils.model import *
 from utils.pca import *
 
-PRINT = 100
+parser = argparse.ArgumentParser(prog='make_pic.py', description='Visualize the first embedding')
+parser.add_argument('task', help="task directory")
+parser.add_argument('-f', '--file', default='animation.mp4')
+parser.add_argument('-d', '--dims', type=int, default=2, help="number of PCA dimensions")
 
-filename = 'animation.mp4'
+args = parser.parse_args()
 
-task_dir = "tasks/first"
+assert args.dims in (2, 3)
 
-_, _, layers, _, n, _, _, num_epochs = load_cfg(task_dir)
+CHECKPOINT = 100
 
-FRAMES = num_epochs//PRINT
+_, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
+
+FRAMES = num_epochs//CHECKPOINT
 
 model = MyModel(n, layers['embed_dim'], layers['hidden_dim'])
 
 Mlist = []
 for i in range(FRAMES):
-    load_checkpoint(model, None, task_dir, epoch=i*PRINT)
+    load_checkpoint(model, None, args.task, epoch=i*PRINT)
     model.eval()
 
-    M = pca(model.embed1.weight)
+    M = pca(model.embed1.weight, dims=args.dims)
 
     Mlist.append(M.detach().numpy())
 
-fig, ax = plt.subplots()
-scat = ax.scatter(Mlist[0][:,0], Mlist[0][:,1])
-ax.set(xlim=(-2, 2), ylim=(-2, 2))
-
-def update(frame):
-    scat.set_offsets(Mlist[frame])
-    return scat
-
-ani = animation.FuncAnimation(fig, update, frames=FRAMES)
+ani = draw_points_movie(Mlist, args.dims, [i*PRINT for i in range(FRAMES)])
 
 FFwriter = animation.FFMpegWriter()
-ani.save(filename, writer=FFwriter)
+ani.save(args.file, writer=FFwriter)

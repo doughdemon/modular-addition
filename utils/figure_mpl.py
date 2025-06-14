@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 
 def draw_points(M, dims=2, epoch=None, loss=None):
     assert dims in (2, 3)
@@ -31,6 +32,39 @@ def draw_points(M, dims=2, epoch=None, loss=None):
             ax.text(X[i], Y[i], Z[i], str(i))
 
     return fig
+
+def draw_points_movie(M, dims=2, epochs=None):
+    assert dims in (2, 3)
+    fig = plt.figure()
+
+    if dims == 2:
+        ax = fig.add_subplot()
+
+        def update(frame):
+            title=""
+            if epochs: title += f"Epoch: {epochs[frame]}"
+            fig.suptitle(title)
+
+            ax.cla()
+            ax.set(xlim=(-2, 2), ylim=(-2, 2))
+            ax.scatter(M[frame][:,0], M[frame][:,1])
+
+        ani = animation.FuncAnimation(fig, update, frames=len(M))
+    else:
+        ax = fig.add_subplot(projection="3d")
+
+        def update(frame):
+            title=""
+            if epochs: title += f"Epoch: {epochs[frame]}"
+            fig.suptitle(title)
+
+            ax.cla()
+            ax.set(xlim=(-2, 2), ylim=(-2, 2), zlim=(-2,2))
+            ax.scatter(M[frame][:,0], M[frame][:,1], M[frame][:,2])
+
+        ani = animation.FuncAnimation(fig, update, frames=len(M))
+
+    return ani
 
 
 def draw_losses(epochs, train, test):
