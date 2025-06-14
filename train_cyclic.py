@@ -87,19 +87,12 @@ try:
 
             optimizer.step()
 
-            if i % PRINT == 0:
-                y = model(test_x)
-                loss_test = lossfn(y, test_y)
-                if i == num_epochs-1:
-                    for j in range(n*n):
-                        if torch.max(y[j],0).indices != test_y[j]:
-                            print(f"{j%n}+{j//n}:")
-                            print(f"Answer: {test_y[j]} Prediction: {torch.max(y[j],0).indices}")
-                            print(y[j])
-                print(f"Epoch: {i} Training loss: {float(loss)} Test loss: {float(loss_test)}")
-
-            if i % CHECKPOINT == 0:
-               save_checkpoint(model, optimizer, {'train': float(loss), 'test': float(loss_test)}, task_dir, epoch=i)
+            if (i % PRINT)*(i % CHECKPOINT) == 0:
+                with torch.no_grad():
+                    y = model(test_x)
+                    loss_test = lossfn(y, test_y)
+                if i % PRINT == 0: print(f"Epoch: {i} Training loss: {float(loss)} Test loss: {float(loss_test)}")
+                if i % CHECKPOINT == 0: save_checkpoint(model, optimizer, {'train': float(loss), 'test': float(loss_test)}, task_dir, epoch=i)
 except KeyboardInterrupt:
     pass
 
