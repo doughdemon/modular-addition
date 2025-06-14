@@ -1,6 +1,6 @@
 import torch
 
-def save_checkpoint(model, optimizer, task_dir, epoch=None, final=False):
+def save_checkpoint(model, optimizer, loss, task_dir, epoch=None, final=False):
     """
     Save model checkpoint.
     """
@@ -8,8 +8,10 @@ def save_checkpoint(model, optimizer, task_dir, epoch=None, final=False):
     if final:
         path = f'{task_dir}/model.pt'
     torch.save({
+        'epoch': epoch,
         'model': model.state_dict(),
         'optimizer': optimizer.state_dict(),
+	'loss': loss
 	}, path)
 
 def load_checkpoint(model, optimizer, task_dir, epoch=None, final=False):
@@ -21,8 +23,7 @@ def load_checkpoint(model, optimizer, task_dir, epoch=None, final=False):
         path = f'{task_dir}/model.pt'
     checkpoint = torch.load(path)
 
-    model.load_state_dict(checkpoint['model'])
-    if optimizer:
-        optimizer.load_state_dict(checkpoint['optimizer'])
+    if model: model.load_state_dict(checkpoint['model'])
+    if optimizer: optimizer.load_state_dict(checkpoint['optimizer'])
 
-    return model
+    return checkpoint['epoch'], checkpoint['loss']

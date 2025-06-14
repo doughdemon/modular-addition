@@ -1,6 +1,7 @@
 import torch
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 import random
+import argparse
 
 from utils.checkpoints import *
 from utils.config import *
@@ -11,7 +12,12 @@ from utils.pca import *
 PRINT = 100
 CHECKPOINT = 100
 
-task_dir = "tasks/first"
+parser = argparse.ArgumentParser(prog='make_pic.py', description='Create a figure')
+parser.add_argument('task', help="task directory")
+
+args = parser.parse_args()
+
+task_dir = args.task
 
 seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task_dir)
 
@@ -70,28 +76,31 @@ try:
     _iter = tqdm.tqdm(_iter)
 except ImportError: pass
 
-for i in _iter:
-    for train_x, train_y in train_dataloader:
-        optimizer.zero_grad()
+try:
+    for i in _iter:
+        for train_x, train_y in train_dataloader:
+            optimizer.zero_grad()
 
-        y = model(train_x)
-        loss = lossfn(y, train_y)
-        loss.backward()
+            y = model(train_x)
+            loss = lossfn(y, train_y)
+            loss.backward()
 
-        optimizer.step()
+            optimizer.step()
 
-        if i % PRINT == 0:
-            y = model(test_x)
-            loss_test = lossfn(y, test_y)
-            if i == num_epochs-1:
-                for j in range(n*n):
-                    if torch.max(y[j],0).indices != test_y[j]:
-                        print(f"{j%n}+{j//n}:")
-                        print(f"Answer: {test_y[j]} Prediction: {torch.max(y[j],0).indices}")
-                        print(y[j])
-            print(f"Epoch: {i} Training loss: {float(loss)} Test loss: {float(loss_test)}")
+            if i % PRINT == 0:
+                y = model(test_x)
+                loss_test = lossfn(y, test_y)
+                if i == num_epochs-1:
+                    for j in range(n*n):
+                        if torch.max(y[j],0).indices != test_y[j]:
+                            print(f"{j%n}+{j//n}:")
+                            print(f"Answer: {test_y[j]} Prediction: {torch.max(y[j],0).indices}")
+                            print(y[j])
+                print(f"Epoch: {i} Training loss: {float(loss)} Test loss: {float(loss_test)}")
 
-        if i % CHECKPOINT == 0:
-            save_checkpoint(model, optimizer, task_dir, epoch=i)
+            if i % CHECKPOINT == 0:
+               save_checkpoint(model, optimizer, {'train': float(loss), 'test': float(loss_test)}, task_dir, epoch=i)
+except KeyboardInterrupt:
+    pass
 
-save_checkpoint(model, optimizer, task_dir, final=True)
+save_checkpoint(model, optimizer, {'train': float(loss), 'test': float(loss_test)}, task_dir, final=True)
