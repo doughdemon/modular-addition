@@ -21,14 +21,10 @@ task_dir = args.task
 
 seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task_dir)
 
-try:
-    import torch_xla.core.xla_model as xm
-    device = xm.xla_device()
-except ImportError:
-    if torch.cuda.is_available():
-        device = 'cuda'
-    else:
-        device = 'cpu'
+if torch.cuda.is_available():
+    device = 'cuda'
+else:
+    device = 'cpu'
 
 def add(a: int, b: int) -> int:
     assert a >= 0 and a < n
