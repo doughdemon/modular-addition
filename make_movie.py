@@ -29,14 +29,14 @@ model = MyModel(n, layers['embed_dim'], layers['hidden_dim'])
 
 Mlist = []
 for i in range(FRAMES):
-    load_checkpoint(model, None, args.task, epoch=i*PRINT)
+    load_checkpoint(model, None, args.task, epoch=i*CHECKPOINT)
     model.eval()
 
     M = pca(model.embed1.weight, dims=args.dims)
 
     Mlist.append(M.detach().numpy())
 
-ani = draw_points_movie(Mlist, args.dims, [i*PRINT for i in range(FRAMES)])
+ani = draw_points_movie(Mlist, args.dims, [i*CHECKPOINT for i in range(FRAMES)])
 
 FFwriter = animation.FFMpegWriter()
 ani.save(args.file, writer=FFwriter)
