@@ -26,7 +26,7 @@ L = torch.tensor(L).transpose(0,1)
 R = torch.randn(embed, embed)
 L = R @ L
 
-M = pca(L)
+M, _ = pca(L)
 
 X = []
 Y = []

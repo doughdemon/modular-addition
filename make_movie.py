@@ -32,7 +32,7 @@ for i in range(FRAMES):
     load_checkpoint(model, None, args.task, epoch=i*CHECKPOINT)
     model.eval()
 
-    M = pca(model.embed1.weight, dims=args.dims)
+    M, _ = pca(model.embed1.weight, dims=args.dims)
 
     Mlist.append(M.detach().numpy())
 

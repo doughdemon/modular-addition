@@ -32,7 +32,7 @@ else:
     epoch, loss = load_checkpoint(model, None, args.task, final=True)
 
 
-M = pca(model.embed1.weight, dims=args.dims).detach().numpy()
+M, _ = pca(model.embed1.weight, dims=args.dims).detach().numpy()
 
 fig = draw_points(M, args.dims, epoch, loss)
 
