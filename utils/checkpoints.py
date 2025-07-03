@@ -1,12 +1,15 @@
+import os
 import torch
 
 def save_checkpoint(model, optimizer, loss, task_dir, epoch=None, final=False):
     """
     Save model checkpoint.
     """
+    checkpoint_dir = task_dir + '/checkpoints'
+    os.makedirs(checkpoint_dir, exist_ok=True)
     path = f'{task_dir}/checkpoints/epoch_{epoch}.pt'
     if final:
-        path = f'{task_dir}/model.pt'
+        path = task_dir + '/model.pt'
     torch.save({
         'epoch': epoch,
         'model': model.state_dict(),
