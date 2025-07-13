@@ -3,9 +3,9 @@ import plotly.express as px
 def draw_points(M, dims=2, epoch=None, loss=None):
     assert dims in (2, 3)
 
-    X = M[:,0]
-    Y = M[:,1]
-    if dims == 3: Z = M[:,2]
+    X = M[0]
+    Y = M[1]
+    if dims == 3: Z = M[2]
 
     if dims == 2:
         fig = px.scatter(x=X, y=Y, text=range(len(X)))
@@ -21,11 +21,11 @@ def draw_lines(M, dims=2, epoch=None, loss=None, aut=1):
 
     idx = [(aut*i)%n for i in range(n)]
 
-    M = M[idx,:]
+    M = M[:,idx]
 
-    X = M[:,0]
-    Y = M[:,1]
-    if dims == 3: Z = M[:,2]
+    X = M[0]
+    Y = M[1]
+    if dims == 3: Z = M[2]
 
     if dims == 2:
         fig = px.line(x=X, y=Y, text=idx)

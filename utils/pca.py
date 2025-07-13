@@ -2,8 +2,7 @@ import torch
 
 def pca(x, dims=2):
     # x: (N, D)
-    A = x.transpose(0,1) # (D, N)
 
-    A = A - A.mean(dim=0) # (D, N)
-    U, S, _ = torch.linalg.svd(A) # (D, D) (D,)
-    return (U@torch.diag(S))[:, :dims], S[:dims] # (D, dims), (dims,)
+    x = x - x.mean(dim=1, keepdim=True) # (N, D)
+    _, S, Vt = torch.linalg.svd(x) # (D,) (D, D)
+    return (torch.diag(S)@Vt)[:dims,:], S[:dims] # (dims, D), (dims,)

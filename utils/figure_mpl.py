@@ -4,9 +4,9 @@ import matplotlib.animation as animation
 def draw_points(M, dims=2, epoch=None, loss=None):
     assert dims in (2, 3)
 
-    X = M[:,0]
-    Y = M[:,1]
-    if dims == 3: Z = M[:,2]
+    X = M[0]
+    Y = M[1]
+    if dims == 3: Z = M[2]
 
     fig = plt.figure()
 
@@ -47,7 +47,7 @@ def draw_points_movie(M, dims=2, epochs=None):
 
             ax.cla()
             ax.set(xlim=(-2, 2), ylim=(-2, 2))
-            ax.scatter(M[frame][:,0], M[frame][:,1])
+            ax.scatter(M[frame][0], M[frame][1])
 
         ani = animation.FuncAnimation(fig, update, frames=len(M))
     else:
@@ -60,7 +60,7 @@ def draw_points_movie(M, dims=2, epochs=None):
 
             ax.cla()
             ax.set(xlim=(-2, 2), ylim=(-2, 2), zlim=(-2,2))
-            ax.scatter(M[frame][:,0], M[frame][:,1], M[frame][:,2])
+            ax.scatter(M[frame][0], M[frame][1], M[frame][2])
 
         ani = animation.FuncAnimation(fig, update, frames=len(M))
 
