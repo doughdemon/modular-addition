@@ -17,7 +17,7 @@ def draw_points(M, dims=2, epoch=None, loss=None):
 def draw_lines(M, dims=2, epoch=None, loss=None, aut=1):
     assert dims in (2, 3)
 
-    n = M.shape[0]
+    n = M.shape[1]
 
     idx = [(aut*i)%n for i in range(n)]
 
