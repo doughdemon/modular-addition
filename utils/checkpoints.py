@@ -1,15 +1,17 @@
 import os
+from pathlib import Path
 import torch
 
-def save_checkpoint(model, optimizer, loss, task_dir, epoch=None, final=False):
+def save_checkpoint(model, optimizer, loss, task, epoch=None, final=False):
     """
     Save model checkpoint.
     """
-    checkpoint_dir = task_dir + '/checkpoints'
-    os.makedirs(checkpoint_dir, exist_ok=True)
-    path = f'{task_dir}/checkpoints/epoch_{epoch}.pt'
+    base_path = Path(f'outputs/{task}')
+    checkpoint_path = base_path / 'checkpoints'
+    checkpoint_path.makedir(parents=True, exist_ok=True)
+    path = checkpoint_path / f'epoch_{epoch}.pt'
     if final:
-        path = task_dir + '/model.pt'
+        path = base_path / 'model.pt'
     torch.save({
         'epoch': epoch,
         'model': model.state_dict(),
@@ -17,13 +19,14 @@ def save_checkpoint(model, optimizer, loss, task_dir, epoch=None, final=False):
 	'loss': loss
 	}, path)
 
-def load_checkpoint(model, optimizer, task_dir, epoch=None, final=False):
+def load_checkpoint(model, optimizer, task, epoch=None, final=False):
     """
     Load model checkpoint.
     """
-    path = f'{task_dir}/checkpoints/epoch_{epoch}.pt'
+    base_path = Path(f'outputs/{task}')
+    path = base_path / f'checkpoints/epoch_{epoch}.pt'
     if final:
-        path = f'{task_dir}/model.pt'
+        path = base_path / f'model.pt'
     checkpoint = torch.load(path)
 
     if model: model.load_state_dict(checkpoint['model'])

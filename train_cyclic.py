@@ -13,13 +13,13 @@ PRINT = 100
 CHECKPOINT = 100
 
 parser = argparse.ArgumentParser(prog='train_cyclic.py', description='Train the neural net')
-parser.add_argument('task', help="task directory")
+parser.add_argument('task', help="task")
 
 args = parser.parse_args()
 
-task_dir = args.task
+task = args.task
 
-seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task_dir)
+seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task)
 
 if torch.cuda.is_available():
     device = 'cuda'
@@ -61,7 +61,7 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_dec
 
 load=False
 if load:
-    load_checkpoint(model, optimizer, task_dir, final=True)
+    load_checkpoint(model, optimizer, task, final=True)
 
 # train the model
 
@@ -88,8 +88,8 @@ try:
                     y = model(test_x)
                     loss_test = lossfn(y, test_y)
                 if i % PRINT == 0: print(f"Epoch: {i} Training loss: {float(loss)} Test loss: {float(loss_test)}")
-                if i % CHECKPOINT == 0: save_checkpoint(model, optimizer, {'train': float(loss), 'test': float(loss_test)}, task_dir, epoch=i)
+                if i % CHECKPOINT == 0: save_checkpoint(model, optimizer, {'train': float(loss), 'test': float(loss_test)}, task, epoch=i)
 except KeyboardInterrupt:
     pass
 
-save_checkpoint(model, optimizer, {'train': float(loss), 'test': float(loss_test)}, task_dir, final=True)
+save_checkpoint(model, optimizer, {'train': float(loss), 'test': float(loss_test)}, task, final=True)
