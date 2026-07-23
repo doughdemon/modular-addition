@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 
 
 parser = argparse.ArgumentParser(prog='make_losspic.py', description='Show the loss curve')
-parser.add_argument('task', help="task directory")
+parser.add_argument('task', help="task")
 parser.add_argument('-f', '--file', default='loss.png')
 parser.add_argument('-n', '--number', default=100, help="number of epochs")
 

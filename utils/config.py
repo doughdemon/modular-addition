@@ -1,7 +1,7 @@
 import json
 
-def load_cfg(task_dir):
-    cfg_file = open(f"{task_dir}/config.json")
+def load_cfg(task):
+    cfg_file = open(f"tasks/{task}/config.json")
     cfg = json.load(cfg_file)
 
     seed = cfg['seed']

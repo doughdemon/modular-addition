@@ -11,7 +11,7 @@ from utils.model import *
 from utils.pca import *
 
 parser = argparse.ArgumentParser(prog='make_pic.py', description='Visualize the first embedding')
-parser.add_argument('task', help="task directory")
+parser.add_argument('task', help="task")
 parser.add_argument('-f', '--file', default='animation.mp4')
 parser.add_argument('-d', '--dims', type=int, default=2, help="number of PCA dimensions")
 
