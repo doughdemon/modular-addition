@@ -33,8 +33,8 @@ Y = []
 S = []
 m = []
 for i in range(n):
-    X.append(float(M[i][0]))
-    Y.append(float(M[i][1]))
+    X.append(float(M[0][i]))
+    Y.append(float(M[1][i]))
 
 # plot
 
