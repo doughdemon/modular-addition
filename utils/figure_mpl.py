@@ -18,6 +18,8 @@ def draw_points(M, dims=2, epoch=None, loss=None):
 
     if dims == 2:
         ax = fig.add_subplot()
+        ax.set_xlabel("PC1")
+        ax.set_ylabel("PC2")
 
         ax.scatter(X, Y)
 
@@ -25,6 +27,9 @@ def draw_points(M, dims=2, epoch=None, loss=None):
             ax.text(X[i], Y[i], str(i))
     else:
         ax = fig.add_subplot(projection='3d')
+        ax.set_xlabel("PC1")
+        ax.set_ylabel("PC2")
+        ax.set_zlabel("PC3")
 
         ax.scatter(X, Y, Z)
 
@@ -46,6 +51,8 @@ def draw_points_movie(M, dims=2, epochs=None):
             fig.suptitle(title)
 
             ax.cla()
+            ax.set_xlabel("PC1")
+            ax.set_ylabel("PC2")
             ax.set(xlim=(-2, 2), ylim=(-2, 2))
             ax.scatter(M[frame][0], M[frame][1])
 
@@ -59,6 +66,9 @@ def draw_points_movie(M, dims=2, epochs=None):
             fig.suptitle(title)
 
             ax.cla()
+            ax.set_xlabel("PC1")
+            ax.set_ylabel("PC2")
+            ax.set_zlabel("PC3")
             ax.set(xlim=(-2, 2), ylim=(-2, 2), zlim=(-2,2))
             ax.scatter(M[frame][0], M[frame][1], M[frame][2])
 
@@ -71,6 +81,8 @@ def draw_losses(epochs, train, test):
     fig = plt.figure()
     ax = fig.add_subplot()
 
+    ax.set_xlabel("epoch")
+    ax.set_ylabel("loss")
     ax.plot(epochs, train)
     ax.plot(epochs, test)
 
