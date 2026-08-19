@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 task = args.task
 
-seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task)
+seed, data_seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task)
 
 if torch.cuda.is_available():
     device = 'cuda'
@@ -48,7 +48,7 @@ test_x = torch.tensor(test_x).to(device)
 test_y = torch.tensor(test_y).to(device)
 
 test_dataset = TensorDataset(test_x, test_y)
-random.seed(seed)
+random.seed(data_seed)
 train_dataset = torch.utils.data.Subset(test_dataset, random.sample(range(n*n), int(frac_train*n*n)))
 train_dataloader = DataLoader(train_dataset, batch_size=len(train_dataset))
 

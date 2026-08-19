@@ -6,5 +6,6 @@
 "group_size": 58,
 "frac_train": 0.4,
 "seed": 0,
+"data_seed": 0,
 "num_epochs": 50000
 }

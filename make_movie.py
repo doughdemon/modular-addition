@@ -21,7 +21,7 @@ assert args.dims in (2, 3)
 
 CHECKPOINT = 100
 
-_, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
+_, _, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
 
 FRAMES = num_epochs//CHECKPOINT
 

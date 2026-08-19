@@ -22,7 +22,7 @@ args = parser.parse_args()
 assert args.dims in (2, 3)
 
 
-_, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
+_, _, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
 
 
 model = MyModel(n, layers['embed_dim'], layers['hidden_dim'])

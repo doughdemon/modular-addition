@@ -15,7 +15,7 @@ parser.add_argument('-f', '--file', default='test_pca.png')
 
 args = parser.parse_args()
 
-_, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
+_, _, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
 
 embed = layers['embed_dim']
 L = []

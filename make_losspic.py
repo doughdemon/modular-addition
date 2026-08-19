@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 CHECKPOINT=100
 
-_, _, _, _, n, _, _, _ = load_cfg(args.task)
+_, _, _, _, _, n, _, _, _ = load_cfg(args.task)
 
 
 epochs = []
