@@ -22,10 +22,10 @@ args = parser.parse_args()
 assert args.dims in (2, 3)
 
 
-_, _, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
+_, _, _, layers, activation, _, n, _, _, num_epochs = load_cfg(args.task)
 
 
-model = MyModel(n, layers['embed_dim'], layers['hidden_dim'])
+model = MyModel(n, layers['embed_dim'], layers['hidden_dim'], activation)
 if args.epoch:
     epoch, loss = load_checkpoint(model, None, args.task, epoch=args.epoch)
 else:

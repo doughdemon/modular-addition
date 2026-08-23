@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 task = args.task
 
-model_seed, data_seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task)
+model_seed, data_seed, frac_train, layers, activation, lr, n, weight_decay, betas, num_epochs = load_cfg(task)
 
 if torch.cuda.is_available():
     device = 'cuda'

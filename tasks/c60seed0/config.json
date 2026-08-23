@@ -3,6 +3,7 @@
 "weight_decay": 1,
 "betas": [0.9, 0.98],
 "layers": {"embed_dim": 256, "hidden_dim": 128},
+"activation": "relu",
 "group_size": 60,
 "frac_train": 0.4,
 "model_seed": 0,

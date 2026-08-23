@@ -21,11 +21,11 @@ assert args.dims in (2, 3)
 
 CHECKPOINT = 100
 
-_, _, _, layers, _, n, _, _, num_epochs = load_cfg(args.task)
+_, _, _, layers, activation, _, n, _, _, num_epochs = load_cfg(args.task)
 
 FRAMES = num_epochs//CHECKPOINT
 
-model = MyModel(n, layers['embed_dim'], layers['hidden_dim'])
+model = MyModel(n, layers['embed_dim'], layers['hidden_dim'], activation)
 
 Mlist = []
 for i in range(FRAMES):
