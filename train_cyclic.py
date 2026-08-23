@@ -19,7 +19,7 @@ args = parser.parse_args()
 
 task = args.task
 
-seed, data_seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task)
+model_seed, data_seed, frac_train, layers, lr, n, weight_decay, betas, num_epochs = load_cfg(task)
 
 if torch.cuda.is_available():
     device = 'cuda'
@@ -54,7 +54,7 @@ train_dataloader = DataLoader(train_dataset, batch_size=len(train_dataset))
 
 lossfn = torch.nn.CrossEntropyLoss()
 
-torch.manual_seed(seed)
+torch.manual_seed(model_seed)
 model = MyModel(n, layers['embed_dim'], layers['hidden_dim']).to(device)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay, betas=betas)
