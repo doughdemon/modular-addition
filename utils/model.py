@@ -2,7 +2,7 @@ import torch
 
 # define the model
 
-def square(input: Tensor, inplace: bool = False) -> Tensor:
+def square(input: torch.Tensor, inplace: bool = False) -> torch.Tensor:
     if inplace:
         result = torch.square_(input)
     else:
